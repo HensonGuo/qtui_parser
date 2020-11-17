@@ -80,3 +80,10 @@ class UiFinder(QtCore.QObject):
         :rtype: QtGui.QLayout
         """
         return object.findChild(QtGui.QLayout, objectName)
+
+    @staticmethod
+    def findQButtonGroup(object, objectName):
+        """
+        :rtype: QtGui.QButtonGroup
+        """
+        return object.findChild(QtGui.QButtonGroup, objectName)

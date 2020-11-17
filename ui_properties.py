@@ -7,26 +7,24 @@ class UIProperties(object):
     Ignores = ["leftMargin", "topMargin", "rightMargin", "bottomMargin"]
 
     def __init__(self):
-        self._debug = False
+        self._logFunc = None
 
-    def setDebug(self, bool):
-        self._debug = bool
+    def setLogFunc(self, func):
+        self._logFunc = func
 
-    def setProperties(self, ui, elem):
-        for prop in elem.findall("property"):
-            prop_name = prop.attrib["name"]
-            if prop_name in UIProperties.Ignores:
-                continue
-            func_name = self.getPropertySetterName(prop_name)
-            func_value = self.getPropertySetterValue(prop)
-            try:
-                func = getattr(ui, func_name)
-                func(func_value)
-                if self._debug:
-                    print u"{}.{}({})".format(ui.objectName(), func_name, func_value)
-            except Exception:
-                # todo 不支持的后续再做支持
-                print "not support %s" % func_name
+    def setProperties(self, ui, prop):
+        prop_name = prop.attrib["name"]
+        if prop_name in UIProperties.Ignores:
+            return
+        func_name = self.getPropertySetterName(prop_name)
+        func_value = self.getPropertySetterValue(prop)
+        try:
+            func = getattr(ui, func_name)
+            func(func_value)
+            self._logFunc(u"{}.{}({})".format(ui.objectName(), func_name, func_value))
+        except Exception:
+            # todo 不支持的后续再做支持
+            self._logFunc("not support %s" % func_name)
 
     def getProperty(self, elem, name, default=None):
         return self._getChild("property", elem, name, default)
@@ -50,7 +48,7 @@ class UIProperties(object):
             return func(valueElement)
         except AttributeError:
             # todo 不支持的后续再做支持
-            print "not support %s" % func_name
+            self._logFunc("not support %s" % func_name)
 
     def getPropertyGetterName(self, tag):
         return "get%s%s" % (tag[0].upper(), tag[1:])
