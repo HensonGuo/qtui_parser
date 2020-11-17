@@ -41,6 +41,7 @@ class UIParser(object):
         content = parse(uifile)
         self._xmlTree = content.getroot()
         self.createWidget(self._xmlTree.find("widget"), parentWidget)
+        self.createConnections(self._xmlTree.find("connections"))
         return self._widget
 
     def everySubTrees(self, widgetElement, parent):
@@ -123,8 +124,18 @@ class UIParser(object):
             self.printCreateOject(buttonGroup, "QtGui.QButtonGroup", parent)
             return buttonGroup
 
+    def createConnections(self, connections):
+        for element in iter(connections):
+            senderName = self._uiprops.findAttrib("sender", element)
+            sender = UiFinder.findQWidget(self._widget, senderName)
+            signalName = self._uiprops.findAttrib("signal", element)
+            receiverName = self._uiprops.findAttrib("receiver", element)
+            receiver = UiFinder.findQWidget(self._widget, receiverName)
+            slotName = self._uiprops.findAttrib("slot", element)
+            getattr(sender, signalName[0:-2]).connect(getattr(receiver, slotName[0:-2]))
+
     def applyProperty(self, propertyElement, target):
-        self._uiprops.setProperties(target, propertyElement)
+        self._uiprops.setProperty(target, propertyElement)
 
     def applyAttribute(self, attrElement, target):
         attribName =  attrElement.attrib["name"]

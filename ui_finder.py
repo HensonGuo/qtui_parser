@@ -9,6 +9,8 @@ class UiFinder(QtCore.QObject):
         """
         :rtype : QtGui.QWidget
         """
+        if object.objectName() == objectName:
+            return object
         return object.findChild(QtGui.QWidget, objectName)
 
     @staticmethod
@@ -16,6 +18,8 @@ class UiFinder(QtCore.QObject):
         """
         :rtype: QtGui.QLabel
         """
+        if object.objectName() == objectName:
+            return object
         return object.findChild(QtGui.QLabel, objectName)
 
     @staticmethod
@@ -23,6 +27,8 @@ class UiFinder(QtCore.QObject):
         """
         :rtype : QtGui.QPushButton
         """
+        if object.objectName() == objectName:
+            return object
         return object.findChild(QtGui.QPushButton, objectName)
 
     @staticmethod
@@ -30,6 +36,8 @@ class UiFinder(QtCore.QObject):
         """
         :rtype: QtGui.QCheckBox
         """
+        if object.objectName() == objectName:
+            return object
         return object.findChild(QtGui.QCheckBox, objectName)
 
     @staticmethod
@@ -37,6 +45,8 @@ class UiFinder(QtCore.QObject):
         """
         :rtype: QtGui.QComboBox
         """
+        if object.objectName() == objectName:
+            return object
         return object.findChild(QtGui.QComboBox, objectName)
 
     @staticmethod
@@ -44,6 +54,8 @@ class UiFinder(QtCore.QObject):
         """
         :rtype: QtGui.QListView
         """
+        if object.objectName() == objectName:
+            return object
         return object.findChild(QtGui.QListView, objectName)
 
     @staticmethod
@@ -51,6 +63,8 @@ class UiFinder(QtCore.QObject):
         """
         :rtype: QtGui.QRadioButton
         """
+        if object.objectName() == objectName:
+            return object
         return object.findChild(QtGui.QRadioButton, objectName)
 
     @staticmethod
@@ -58,6 +72,8 @@ class UiFinder(QtCore.QObject):
         """
         :rtype: QtGui.QScrollBar
         """
+        if object.objectName() == objectName:
+            return object
         return object.findChild(QtGui.QScrollBar, objectName)
 
     @staticmethod
@@ -65,6 +81,8 @@ class UiFinder(QtCore.QObject):
         """
         :rtype: QtGui.QTextEdit
         """
+        if object.objectName() == objectName:
+            return object
         return object.findChild(QtGui.QTextEdit, objectName)
 
     @staticmethod
@@ -72,6 +90,8 @@ class UiFinder(QtCore.QObject):
         """
         :rtype: QtGui.QStackedWidget
         """
+        if object.objectName() == objectName:
+            return object
         return object.findChild(QtGui.QStackedWidget, objectName)
 
     @staticmethod
@@ -79,6 +99,8 @@ class UiFinder(QtCore.QObject):
         """
         :rtype: QtGui.QLayout
         """
+        if object.objectName() == objectName:
+            return object
         return object.findChild(QtGui.QLayout, objectName)
 
     @staticmethod
@@ -86,4 +108,6 @@ class UiFinder(QtCore.QObject):
         """
         :rtype: QtGui.QButtonGroup
         """
+        if object.objectName() == objectName:
+            return object
         return object.findChild(QtGui.QButtonGroup, objectName)

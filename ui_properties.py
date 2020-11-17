@@ -12,7 +12,7 @@ class UIProperties(object):
     def setLogFunc(self, func):
         self._logFunc = func
 
-    def setProperties(self, ui, prop):
+    def setProperty(self, ui, prop):
         prop_name = prop.attrib["name"]
         if prop_name in UIProperties.Ignores:
             return
@@ -27,10 +27,12 @@ class UIProperties(object):
             self._logFunc("not support %s" % func_name)
 
     def getProperty(self, elem, name, default=None):
-        return self._getChild("property", elem, name, default)
+        return self.findAttrib("property", elem, name, default)
 
-    def _getChild(self, elem_tag, elem, name, default=None):
-        for prop in elem.findall(elem_tag):
+    def findAttrib(self, tag, elememt, name=None, default=None):
+        for prop in elememt.findall(tag):
+            if not name:
+                return prop.text
             if prop.attrib["name"] == name:
                 return self.getPropertySetterValue(prop)
         else:
