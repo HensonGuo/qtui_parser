@@ -19,12 +19,12 @@ class UIProperties(object):
                 continue
             func_name = self.getPropertySetterName(prop_name)
             func_value = self.getPropertySetterValue(prop)
-            func = getattr(widget, func_name)
-            if func:
+            try:
+                func = getattr(widget, func_name)
                 func(func_value)
                 if self._debug:
                     print u"{}.{}({})".format(widget.objectName(), func_name, func_value)
-            else:
+            except Exception:
                 # todo 不支持的后续再做支持
                 print "not support %s" % func_name
 
@@ -45,10 +45,13 @@ class UIProperties(object):
         valueElement = prop[0]
         tag = valueElement.tag
         func_name = self.getPropertyGetterName(tag)
-        func = getattr(self, func_name)
-        if func:
-            return func(valueElement)
-        else:
+        try:
+            func = getattr(self, func_name)
+            if tag == "set":
+                return func(valueElement, prop.attrib["name"])
+            else:
+                return func(valueElement)
+        except AttributeError:
             # todo 不支持的后续再做支持
             print "not support %s" % func_name
 
@@ -96,6 +99,24 @@ class UIProperties(object):
 
     def getRectf(self, prop):
         return QtCore.QRectF(*float_list(prop))
+
+    def getCursorShape(self, prop):
+        return QtGui.QCursor(getattr(QtCore.Qt, prop.text))
+
+    def getSet(self, prop, propName):
+        if propName == "alignment":
+            alignment = prop.text
+            align_flags = None
+            for qt_align in alignment.split('|'):
+                _, qt_align = qt_align.split('::')
+                align = getattr(QtCore.Qt, qt_align)
+                if align_flags is None:
+                    align_flags = align
+                else:
+                    align_flags |= align
+            return align_flags
+        else:
+            pass
 
 def int_list(prop):
     return [int(child.text) for child in prop]
