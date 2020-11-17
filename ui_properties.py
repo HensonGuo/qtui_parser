@@ -47,10 +47,7 @@ class UIProperties(object):
         func_name = self.getPropertyGetterName(tag)
         try:
             func = getattr(self, func_name)
-            if tag == "set":
-                return func(valueElement, prop.attrib["name"])
-            else:
-                return func(valueElement)
+            return func(valueElement)
         except AttributeError:
             # todo 不支持的后续再做支持
             print "not support %s" % func_name
@@ -103,20 +100,28 @@ class UIProperties(object):
     def getCursorShape(self, prop):
         return QtGui.QCursor(getattr(QtCore.Qt, prop.text))
 
-    def getSet(self, prop, propName):
-        if propName == "alignment":
-            alignment = prop.text
-            align_flags = None
-            for qt_align in alignment.split('|'):
-                _, qt_align = qt_align.split('::')
-                align = getattr(QtCore.Qt, qt_align)
-                if align_flags is None:
-                    align_flags = align
-                else:
-                    align_flags |= align
-            return align_flags
-        else:
-            pass
+    def getSet(self, prop):
+        expr = [self.getQtAttr(v) for v in prop.text.split('|')]
+
+        value = expr[0]
+        for v in expr[1:]:
+            value |= v
+
+        return value
+
+    def getEnum(self, prop):
+        return self.getQtAttr(prop.text)
+
+    def getQtAttr(self, propText):
+        try:
+            prefix, membername = propText.split("::")
+        except ValueError:
+            prefix = "Qt"
+            membername = propText
+
+        if prefix == "Qt":
+            return getattr(QtCore.Qt, membername)
+        raise AttributeError("unknown attr %s" % propText)
 
 def int_list(prop):
     return [int(child.text) for child in prop]
