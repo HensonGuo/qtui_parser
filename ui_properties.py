@@ -24,7 +24,7 @@ class UIProperties(object):
             self._logFunc(u"{}.{}({})".format(ui.objectName(), func_name, func_value))
         except Exception:
             # todo 不支持的后续再做支持
-            self._logFunc("not support %s" % func_name)
+            self._logFunc("warning: not support %s" % func_name)
 
     def getProperty(self, elem, name, default=None):
         return self.findAttrib("property", elem, name, default)
@@ -50,7 +50,7 @@ class UIProperties(object):
             return func(valueElement)
         except AttributeError:
             # todo 不支持的后续再做支持
-            self._logFunc("not support %s" % func_name)
+            self._logFunc("warning: not support %s" % func_name)
 
     def getPropertyGetterName(self, tag):
         return "get%s%s" % (tag[0].upper(), tag[1:])
@@ -122,6 +122,9 @@ class UIProperties(object):
         if prefix == "Qt":
             return getattr(QtCore.Qt, membername)
         raise AttributeError("unknown attr %s" % propText)
+
+    def getPixmap(self, prop):
+        return QtGui.QPixmap(prop.text)
 
 def int_list(prop):
     return [int(child.text) for child in prop]

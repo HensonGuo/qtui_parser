@@ -143,12 +143,12 @@ class UIParser(object):
             buttonGroupName = self._uiprops.getPropertySetterValue(attrElement)
             buttonGroup = self.getButtonGroup(buttonGroupName)
             if not buttonGroup:
-                self.printLog("not exist buttongroup %s" % buttonGroupName)
+                self.printLog("warning: not exist buttongroup %s" % buttonGroupName)
                 return
             buttonGroup.addButton(target)
         else:
             # todo 不支持的后续再做支持
-            self.printLog("not support attrib %s" % attribName)
+            self.printLog("warning: not support attrib %s" % attribName)
 
     def getObjectName(self, element):
         objectName = element.attrib["name"]
