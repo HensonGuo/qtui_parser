@@ -6,7 +6,7 @@ class UIProperties(object):
     # ignore the propertys
     Ignores = ["leftMargin", "topMargin", "rightMargin", "bottomMargin"]
 
-    def __init__(self, parent):
+    def __init__(self):
         self._debug = False
 
     def setDebug(self, bool):

@@ -7,9 +7,9 @@ from ui_properties import UIProperties
 
 class UIParser(object):
 
-    def __init__(self, parent=None):
+    def __init__(self):
         super(UIParser, self).__init__()
-        self._uiprops = UIProperties(self)
+        self._uiprops = UIProperties()
         self._handerMap = {
             "widget":self.createWidget,
             "layout":self.createLayout,
@@ -45,7 +45,7 @@ class UIParser(object):
         if not self._widget:
             self._widget = widget
         widget.setObjectName(objName)
-        if isinstance(parent, QtGui.QLayout):
+        if isinstance(parent, QtGui.QLayout) or isinstance(parent, QtGui.QStackedWidget):
             parent.addWidget(widget)
         else:
             widget.setParent(parent)
@@ -65,8 +65,6 @@ class UIParser(object):
         else:
             parent.setLayout(layout)
         self.printCreateOject(layout, module, parent)
-        if parent.objectName() == "widgetWarning":
-            print 'aa'
 
         left = self._uiprops.getProperty(layoutElement, 'leftMargin', -1)
         top = self._uiprops.getProperty(layoutElement, 'topMargin', -1)
@@ -90,29 +88,34 @@ class UIParser(object):
         return objectName
 
     def printCreateOject(self, obj, createModule, parent):
-        if self._debug:
-            print "\n%s = %s" % (obj.objectName(), createModule)
-            if not parent:
-                return
-            if isinstance(parent, QtGui.QLayout):
-                if isinstance(obj, QtGui.QLayout):
-                    print "%s.addLayout(%s)" % (parent.objectName(), obj.objectName())
-                else:
-                    print "%s.addWidget(%s)" % (parent.objectName(), obj.objectName())
+        if not self._debug:
+            return
+        print "\n%s = %s" % (obj.objectName(), createModule)
+        print "%s.setObjectName(%s)" % (obj.objectName(), obj.objectName())
+        if parent is None:
+            return
+        if isinstance(parent, QtGui.QLayout):
+            if isinstance(obj, QtGui.QLayout):
+                print "%s.addLayout(%s)" % (parent.objectName(), obj.objectName())
             else:
-                if isinstance(obj, QtGui.QLayout):
-                    print "%s.setLayout(%s)" % (obj.objectName(), parent.objectName())
-                else:
-                    print "%s.setParent(%s)" % (obj.objectName(), parent.objectName())
+                print "%s.addWidget(%s)" % (parent.objectName(), obj.objectName())
+        else:
+            if isinstance(obj, QtGui.QLayout):
+                print "%s.setLayout(%s)" % (obj.objectName(), parent.objectName())
+            else:
+                print "%s.setParent(%s)" % (obj.objectName(), parent.objectName())
 
 
 
 
 if __name__ == "__main__":
     import sys
+    from ui_finder import UiFinder
     app = QtGui.QApplication(sys.argv)
     uiparser = UIParser()
     uiparser.setDebug(True)
-    widget = uiparser.parse(r"D:\Work\apps_wonderful\transformer\gamelive\ent_vote\entertainment_vote\ui\historyform.ui", None)
+    widget = uiparser.parse(r"D:\Work\apps_wonderful\transformer\gamelive\ent_vote\entertainment_vote\ui\createform.ui", None)
+    stackedWidget = UiFinder.findQStackedWidget(widget, "stackedWidget")
+    stackedWidget.setCurrentIndex(2)
     widget.show()
     app.exec_()
