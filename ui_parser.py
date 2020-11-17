@@ -74,6 +74,9 @@ class UIParser(object):
         bottom = self._uiprops.getProperty(layoutElement, 'bottomMargin', -1)
         layout.setContentsMargins(left, top, right, bottom)
 
+        margin = self._uiprops.getProperty(layoutElement, "margin", 0)
+        layout.setMargin(margin)
+
         self._uiprops.setProperties(layout, layoutElement)
         self.everySubTrees(layoutElement, layout)
         return layout
@@ -128,7 +131,7 @@ class UIParser(object):
                 print "%s.addWidget(%s)" % (parent.objectName(), obj.objectName())
         else:
             if isinstance(obj, QtGui.QLayout):
-                print "%s.setLayout(%s)" % (obj.objectName(), parent.objectName())
+                print "%s.setLayout(%s)" % (parent.objectName(), obj.objectName())
             else:
                 print "%s.setParent(%s)" % (obj.objectName(), parent.objectName())
 
@@ -142,5 +145,7 @@ if __name__ == "__main__":
     uiparser = UIParser()
     uiparser.setDebug(True)
     widget = uiparser.parse(r"D:\Work\apps_wonderful\transformer\gamelive\ent_vote\entertainment_vote\ui\mainwidget.ui", None)
+    # verticalLayout_3 = UiFinder.findQLayout(widget, "verticalLayout_3")
+    # verticalLayout_3.setMargin(0)
     widget.show()
     app.exec_()

@@ -73,3 +73,10 @@ class UiFinder(QtCore.QObject):
         :rtype: QtGui.QStackedWidget
         """
         return object.findChild(QtGui.QStackedWidget, objectName)
+
+    @staticmethod
+    def findQLayout(object, objectName):
+        """
+        :rtype: QtGui.QLayout
+        """
+        return object.findChild(QtGui.QLayout, objectName)
