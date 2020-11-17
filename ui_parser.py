@@ -1,7 +1,7 @@
 #-*- coding:utf8 -*-
 
 from xml.etree.ElementTree import parse
-from PyQt4 import QtGui
+from PyQt4 import QtGui, QtCore
 from ui_properties import UIProperties
 
 
@@ -14,6 +14,7 @@ class UIParser(object):
             "widget":self.createWidget,
             "layout":self.createLayout,
             "item": self.createItem,
+            "spacer": self.createSpacer,
         }
         self._debug = False
         self._widget = None
@@ -23,6 +24,7 @@ class UIParser(object):
         self._uiprops.setDebug(bool)
 
     def parse(self, uifile, res_prefix, parentWidget=None):
+        self._widget = None
         self._resPrefix = res_prefix
         content = parse(uifile)
         root = content.getroot()
@@ -80,6 +82,20 @@ class UIParser(object):
         if isinstance(parent, QtGui.QLayout):
             self.everySubTrees(itemElement, parent)
 
+    def createSpacer(self, spacerElement, parent):
+        sizeType = self._uiprops.getProperty(spacerElement, "sizeType", QtGui.QSizePolicy.Expanding)
+        orientation = self._uiprops.getProperty(spacerElement, "orientation")
+        size = self._uiprops.getProperty(spacerElement, "sizeHint")
+        if orientation == QtCore.Qt.Horizontal:
+            spacerItem = QtGui.QSpacerItem(size.width(), size.height(), sizeType, QtGui.QSizePolicy.Minimum)
+        else:
+            spacerItem = QtGui.QSpacerItem(size.width(), size.height(), QtGui.QSizePolicy.Minimum, sizeType)
+        if not isinstance(parent, QtGui.QLayout):
+            return
+        parent.addItem(spacerItem)
+        self.printCreateOject(spacerItem, "QtGui.QSpacerItem", parent)
+        return spacerItem
+
     def getObjectName(self, element):
         className = element.attrib["class"]
         objectName = element.attrib["name"]
@@ -90,10 +106,21 @@ class UIParser(object):
     def printCreateOject(self, obj, createModule, parent):
         if not self._debug:
             return
-        print "\n%s = %s" % (obj.objectName(), createModule)
-        print "%s.setObjectName(%s)" % (obj.objectName(), obj.objectName())
         if parent is None:
             return
+        if isinstance(obj, QtGui.QSpacerItem):
+            orienD = obj.expandingDirections()
+            hPolicy = "QtGui.QSizePolicy.Expanding" \
+                if orienD == QtCore.Qt.Horizontal else "QtGui.QSizePolicy.Minimum"
+            vPolicy = "QtGui.QSizePolicy.Minimum" \
+                if orienD == QtCore.Qt.Horizontal else "QtGui.QSizePolicy.Expanding"
+            print "\nspacerItem = QtGui.QSpacerItem(%d, %d, %s, %s)" % \
+                  (obj.sizeHint().width(), obj.sizeHint().height(), hPolicy, vPolicy)
+            print "%s.addItem(spacerItem)" % (parent.objectName())
+            return
+
+        print "\n%s = %s" % (obj.objectName(), createModule)
+        print "%s.setObjectName(%s)" % (obj.objectName(), obj.objectName())
         if isinstance(parent, QtGui.QLayout):
             if isinstance(obj, QtGui.QLayout):
                 print "%s.addLayout(%s)" % (parent.objectName(), obj.objectName())
@@ -114,8 +141,6 @@ if __name__ == "__main__":
     app = QtGui.QApplication(sys.argv)
     uiparser = UIParser()
     uiparser.setDebug(True)
-    widget = uiparser.parse(r"D:\Work\apps_wonderful\transformer\gamelive\ent_vote\entertainment_vote\ui\createform.ui", None)
-    stackedWidget = UiFinder.findQStackedWidget(widget, "stackedWidget")
-    stackedWidget.setCurrentIndex(2)
+    widget = uiparser.parse(r"D:\Work\apps_wonderful\transformer\gamelive\ent_vote\entertainment_vote\ui\mainwidget.ui", None)
     widget.show()
     app.exec_()

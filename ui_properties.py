@@ -12,7 +12,7 @@ class UIProperties(object):
     def setDebug(self, bool):
         self._debug = bool
 
-    def setProperties(self, widget, elem):
+    def setProperties(self, ui, elem):
         for prop in elem.findall("property"):
             prop_name = prop.attrib["name"]
             if prop_name in UIProperties.Ignores:
@@ -20,10 +20,10 @@ class UIProperties(object):
             func_name = self.getPropertySetterName(prop_name)
             func_value = self.getPropertySetterValue(prop)
             try:
-                func = getattr(widget, func_name)
+                func = getattr(ui, func_name)
                 func(func_value)
                 if self._debug:
-                    print u"{}.{}({})".format(widget.objectName(), func_name, func_value)
+                    print u"{}.{}({})".format(ui.objectName(), func_name, func_value)
             except Exception:
                 # todo 不支持的后续再做支持
                 print "not support %s" % func_name
