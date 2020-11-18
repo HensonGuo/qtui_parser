@@ -182,10 +182,11 @@ class UIParser(object):
         self._uiprops.setResources(self._resMap)
 
     def loadQrcFile(self, qrcFile, resDir):
-        xmlTree = self.getXmlTree(resDir + "\\" + qrcFile)
+        qrcFilePath = resDir.replace("\\", "/") + "/" + qrcFile
+        xmlTree = self.getXmlTree(qrcFilePath)
         for resItem in iter(xmlTree):
             prefix = resItem.attrib.get("prefix")
-            self.recordResources(prefix, resItem, resDir)
+            self.recordResources(prefix, resItem, qrcFilePath[0:qrcFilePath.rfind("/")])
 
     def recordResources(self, prefix, qrcElements, resDir):
         for element in iter(qrcElements):
