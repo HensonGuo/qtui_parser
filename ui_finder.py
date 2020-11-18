@@ -111,3 +111,12 @@ class UiFinder(QtCore.QObject):
         if object.objectName() == objectName:
             return object
         return object.findChild(QtGui.QButtonGroup, objectName)
+
+    @staticmethod
+    def findQFrame(object, objectName):
+        """
+        :rtype: QtGui.QFrame
+        """
+        if object.objectName() == objectName:
+            return object
+        return object.findChild(QtGui.QFrame, objectName)
