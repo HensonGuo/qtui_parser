@@ -40,12 +40,13 @@ class UIParser(object):
         parser.feed(source)
         return parser.close()
 
-    def parse(self, uifile, res_prefix, parentWidget=None, debug=False):
+    def parse(self, uifile, loadRes=False, parentWidget=None, debug=False):
         self.setDebug(debug)
         self._widget = None
-        self._resPrefix = res_prefix
         self._xmlTree = self.getXmlTree(uifile)
         past = time.time()
+        if loadRes:
+            self.readResources(self._xmlTree.find("resources"), uifile[0:uifile.rfind("\\")])
         self.createWidget(self._xmlTree.find("widget"), parentWidget)
         cost = time.time() - past
         self.printLog("\ncreate widgets cost %ds" % cost)
@@ -173,6 +174,23 @@ class UIParser(object):
             # todo 不支持的后续再做支持
             self.printLog("warning: not support attrib %s" % attribName)
 
+    def readResources(self, resElement, resDir):
+        self._resMap = {}
+        for item in iter(resElement):
+            location = item.attrib.get("location")
+            self.loadQrcFile(location, resDir)
+        self._uiprops.setResources(self._resMap)
+
+    def loadQrcFile(self, qrcFile, resDir):
+        xmlTree = self.getXmlTree(resDir + "\\" + qrcFile)
+        for resItem in iter(xmlTree):
+            prefix = resItem.attrib.get("prefix")
+            self.recordResources(prefix, resItem, resDir)
+
+    def recordResources(self, prefix, qrcElements, resDir):
+        for element in iter(qrcElements):
+            self._resMap[":/%s/%s" % (prefix, element.text)] = "%s/%s" % (resDir.replace("\\", "/"), element.text)
+
     def getObjectName(self, element):
         objectName = element.attrib["name"]
         if not objectName:
@@ -226,7 +244,7 @@ if __name__ == "__main__":
     app = QtGui.QApplication(sys.argv)
     uiparser = UIParser()
     # import img_rc
-    widget = uiparser.parse(r"D:\Work\apps_wonderful\resource\gamelive_right_region\fan_badge\fans_club.ui", None, debug=True)
+    widget = uiparser.parse(r"D:\Work\apps_wonderful\resource\gamelive_right_region\fan_badge\fans_club.ui", loadRes=True, debug=True)
     widget.show()
     widget.move(500, 500)
     app.exec_()

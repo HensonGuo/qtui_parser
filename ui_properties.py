@@ -1,6 +1,6 @@
 #-*- coding:utf8 -*-
 from PyQt4 import QtGui, QtCore
-
+import re
 
 class UIProperties(object):
     # ignore the propertys
@@ -8,6 +8,7 @@ class UIProperties(object):
 
     def __init__(self):
         self._logFunc = None
+        self._loadedResMap = None
 
     def setLogFunc(self, func):
         self._logFunc = func
@@ -20,6 +21,8 @@ class UIProperties(object):
         func_value = self.getPropertySetterValue(prop)
         try:
             func = getattr(ui, func_name)
+            if func_name == "setStyleSheet":
+                func_value = self.replaceStyleSheet2LoadedRes(func_value)
             func(func_value)
             self._logFunc(u"{}.{}({})".format(ui.objectName(), func_name, func_value))
         except Exception:
@@ -132,7 +135,10 @@ class UIProperties(object):
         return getattr(module, membername)
 
     def getPixmap(self, prop):
-        return QtGui.QPixmap(prop.text)
+        resPath = prop.text
+        if self._loadedResMap and resPath in self._loadedResMap:
+            resPath = self._loadedResMap[resPath]
+        return QtGui.QPixmap(resPath)
 
     def getFont(self, prop):
         font = QtGui.QFont()
@@ -158,6 +164,22 @@ class UIProperties(object):
         if strikeout:
             font.setStrikeOut(strikeout == "true")
         return font
+
+    def setResources(self, resMap):
+        self._loadedResMap = resMap
+
+    def replaceStyleSheet2LoadedRes(self, stylesheet):
+        if not self._loadedResMap:
+            return stylesheet
+        reg = r"url\(.*?\)"
+        results = re.findall(reg, stylesheet)
+        for result in results:
+            oldRes = result[4:-1]
+            loadedRes = self._loadedResMap.get(oldRes)
+            if not loadedRes:
+                continue
+            stylesheet = stylesheet.replace(oldRes, loadedRes)
+        return stylesheet
 
 def int_list(prop):
     return [int(child.text) for child in prop]
