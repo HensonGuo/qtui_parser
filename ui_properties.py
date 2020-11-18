@@ -48,9 +48,9 @@ class UIProperties(object):
         try:
             func = getattr(self, func_name)
             return func(valueElement)
-        except AttributeError:
+        except AttributeError, error:
             # todo 不支持的后续再做支持
-            self._logFunc("warning: not support %s" % func_name)
+            self._logFunc("warning: not support %s" % error.message)
 
     def getPropertyGetterName(self, tag):
         return "get%s%s" % (tag[0].upper(), tag[1:])
@@ -69,6 +69,9 @@ class UIProperties(object):
         translated = QtGui.QApplication.translate("", text,
                 disambig, encoding)
         return translated
+
+    def getCstring(self, prop):
+        return prop.text
 
     def getNumber(self, prop):
         return int(prop.text)
@@ -115,13 +118,18 @@ class UIProperties(object):
     def getQtAttr(self, propText):
         try:
             prefix, membername = propText.split("::")
-        except ValueError:
+        except Exception:
             prefix = "Qt"
             membername = propText
 
-        if prefix == "Qt":
-            return getattr(QtCore.Qt, membername)
-        raise AttributeError("unknown attr %s" % propText)
+        try:
+            module = eval("QtCore.%s" % prefix)
+        except Exception:
+            try:
+                module = eval("QtGui.%s" % prefix)
+            except Exception:
+                raise AttributeError("unknown attr %s" % propText)
+        return getattr(module, membername)
 
     def getPixmap(self, prop):
         return QtGui.QPixmap(prop.text)
