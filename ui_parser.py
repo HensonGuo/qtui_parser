@@ -55,6 +55,8 @@ class UIParser(object):
     def createWidget(self, widgetElement, parent):
         className = widgetElement.attrib["class"]
         objName = self.getObjectName(widgetElement)
+        if className == "Line":
+            return self.createLine(widgetElement, parent)
         module = "QtGui.%s()" % className
         widget = eval(module)
         if not self._widget:
@@ -67,6 +69,17 @@ class UIParser(object):
         self.printCreateOject(widget, module, parent)
         self.everySubTrees(widgetElement, widget)
         return widget
+
+    def createLine(self, lineElement, parent):
+        line = QtGui.QFrame(parent)
+        line.setObjectName(self.getObjectName(lineElement))
+        orientation = self._uiprops.findAttrib("property", lineElement, "orientation")
+        if orientation == QtCore.Qt.Horizontal:
+            line.setFrameShape(QtGui.QFrame.HLine)
+        else:
+            line.setFrameShape(QtGui.QFrame.VLine)
+        self.printCreateOject(line, "QtGui.QFrame", parent)
+        self.everySubTrees(lineElement, line)
 
     def createLayout(self, layoutElement, parent):
         className = layoutElement.attrib["class"]
