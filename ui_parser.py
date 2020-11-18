@@ -1,9 +1,10 @@
 #-*- coding:utf8 -*-
 
 from PyQt4 import QtGui, QtCore
-from xml.etree.ElementTree import parse
+from xml.etree.ElementTree import parse, XMLParser, TreeBuilder
 from ui_properties import UIProperties
 from ui_finder import UiFinder
+import time
 
 
 class UIParser(object):
@@ -29,12 +30,25 @@ class UIParser(object):
     def setDebug(self, bool):
         self._debug = bool
 
-    def parse(self, uifile, res_prefix, parentWidget=None):
+    def getXmlTree(self, uifile):
+        file = QtCore.QFile(uifile)
+        if not file.open(QtCore.QIODevice.ReadOnly | QtCore.QIODevice.Text):
+            return None
+        source = file.readAll()
+        file.close()
+        parser = XMLParser(target=TreeBuilder())
+        parser.feed(source)
+        return parser.close()
+
+    def parse(self, uifile, res_prefix, parentWidget=None, debug=False):
+        self.setDebug(debug)
         self._widget = None
         self._resPrefix = res_prefix
-        content = parse(uifile)
-        self._xmlTree = content.getroot()
+        self._xmlTree = self.getXmlTree(uifile)
+        past = time.time()
         self.createWidget(self._xmlTree.find("widget"), parentWidget)
+        cost = time.time() - past
+        self.printLog("\ncreate widgets cost %ds" % cost)
         self.createConnections(self._xmlTree.find("connections"))
         del self._xmlTree
         self._xmlTree = None
@@ -211,9 +225,8 @@ if __name__ == "__main__":
     import sys
     app = QtGui.QApplication(sys.argv)
     uiparser = UIParser()
-    uiparser.setDebug(True)
     # import img_rc
-    widget = uiparser.parse(r"D:\Work\apps_wonderful\resource\gamelive_right_region\fan_badge\fans_club.ui", None)
+    widget = uiparser.parse(r"D:\Work\apps_wonderful\resource\gamelive_right_region\fan_badge\fans_club.ui", None, debug=True)
     widget.show()
     widget.move(500, 500)
     app.exec_()
