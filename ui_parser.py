@@ -29,12 +29,6 @@ class UIParser(object):
     def setDebug(self, bool):
         self._debug = bool
 
-    def clear(self):
-        if self._xmlTree:
-            self._xmlTree.deleteLater()
-            self._xmlTree = None
-        self._widget = None
-
     def parse(self, uifile, res_prefix, parentWidget=None):
         self._widget = None
         self._resPrefix = res_prefix
@@ -42,6 +36,8 @@ class UIParser(object):
         self._xmlTree = content.getroot()
         self.createWidget(self._xmlTree.find("widget"), parentWidget)
         self.createConnections(self._xmlTree.find("connections"))
+        del self._xmlTree
+        self._xmlTree = None
         return self._widget
 
     def everySubTrees(self, widgetElement, parent):
@@ -216,10 +212,8 @@ if __name__ == "__main__":
     app = QtGui.QApplication(sys.argv)
     uiparser = UIParser()
     uiparser.setDebug(True)
-    import img_rc
-    widget = uiparser.parse(r"D:\Work\apps_wonderful\transformer\gamelive\ent_vote\entertainment_vote\ui\createform.ui", None)
-    stackedWidget = UiFinder.findQStackedWidget(widget, "stackedWidget")
-    stackedWidget.setCurrentIndex(1)
+    # import img_rc
+    widget = uiparser.parse(r"D:\Work\apps_wonderful\resource\gamelive_right_region\fan_badge\fans_club.ui", None)
     widget.show()
     widget.move(500, 500)
     app.exec_()

@@ -134,6 +134,31 @@ class UIProperties(object):
     def getPixmap(self, prop):
         return QtGui.QPixmap(prop.text)
 
+    def getFont(self, prop):
+        font = QtGui.QFont()
+        family = self.findAttrib("family", prop)
+        if family:
+            font.setFamily(family)
+        pointsize = self.findAttrib("pointsize", prop)
+        if pointsize:
+            font.setPointSize(int(pointsize))
+        weight = self.findAttrib("weight", prop)
+        if weight:
+            font.setWeight(int(weight))
+        italic = self.findAttrib("italic", prop)
+        if italic:
+            font.setItalic(italic=="true")
+        bold = self.findAttrib("bold", prop)
+        if bold:
+            font.setBold(bold == "true")
+        underline = self.findAttrib("underline", prop)
+        if underline:
+            font.setUnderline(underline == "true")
+        strikeout = self.findAttrib("strikeout", prop)
+        if strikeout:
+            font.setStrikeOut(strikeout == "true")
+        return font
+
 def int_list(prop):
     return [int(child.text) for child in prop]
 
