@@ -41,12 +41,13 @@ class UIParser(object):
         return parser.close()
 
     def parse(self, uifile, loadRes=False, parentWidget=None, debug=False):
+        uifile= uifile.replace("\\", "/")
         self.setDebug(debug)
         self._widget = None
         self._xmlTree = self.getXmlTree(uifile)
         past = time.time()
         if loadRes:
-            self.readResources(self._xmlTree.find("resources"), uifile[0:uifile.rfind("\\")])
+            self.readResources(self._xmlTree.find("resources"), uifile[0:uifile.rfind("/")])
         self.createWidget(self._xmlTree.find("widget"), parentWidget)
         cost = time.time() - past
         self.printLog("\ncreate widgets cost %ds" % cost)
@@ -182,7 +183,7 @@ class UIParser(object):
         self._uiprops.setResources(self._resMap)
 
     def loadQrcFile(self, qrcFile, resDir):
-        qrcFilePath = resDir.replace("\\", "/") + "/" + qrcFile
+        qrcFilePath = resDir + "/" + qrcFile
         xmlTree = self.getXmlTree(qrcFilePath)
         for resItem in iter(xmlTree):
             prefix = resItem.attrib.get("prefix")
