@@ -1,15 +1,15 @@
-#### Features
+### Features
 
 1. 界面与逻辑分离，代码编写更加精简美观，不需要花费太长的时间用代码用调整界面，将更多的精力用来关注逻辑的编写与实现
 ![](http://cc.fp.ps.netease.com/file/5fb7755c5e60276c1a6abd841icbEsTi02)
 2. 充分利用qt设计师的功能，提高生产力
 3. 资源加载方式方便快捷，可根据具体需求灵活设置
 
-#### vs.Pyuic&Xmlui
+### vs.Pyuic&Xmlui
 1. 目前项目中的xmlui需要手动编辑，缺少可视化工具，效率比较低
 2. pyuic生成的py文件可读性差，关联的qrc资源文件需要打包在模板内，增大模板体积
 
-#### How2use
+### How2use
 UI创建：
 ```python
 widget = UIParser().parse(uiFilePath, loadRes=False, parentWidget=None, debug=False)
