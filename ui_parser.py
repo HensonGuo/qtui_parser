@@ -64,7 +64,28 @@ class UIParser(object):
                 continue
             handler(child, parent)
 
+    def handleZOrder(self, widgetElement):
+        zorders = widgetElement.findall("zorder")
+        if not zorders:
+            return
+        childWidgetMap = {}
+        insertChildIndex = -1
+        for index, child in enumerate(widgetElement.getchildren()):
+            if child.tag == "widget":
+                childWidgetMap[child.attrib["name"]] = child
+            if insertChildIndex == -1:
+                insertChildIndex = index
+        for zorder in zorders:
+            name = zorder.text
+            widget = childWidgetMap.get(name)
+            if not widget:
+                continue
+            widgetElement.remove(widget)
+            widgetElement.insert(insertChildIndex, widget)
+            insertChildIndex += 1
+
     def createWidget(self, widgetElement, parent):
+        self.handleZOrder(widgetElement)
         className = widgetElement.attrib["class"]
         objName = self.getObjectName(widgetElement)
         if className == "Line":
